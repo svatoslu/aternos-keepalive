@@ -3,7 +3,7 @@ const express = require('express');
 
 const SERVER_HOST = 'vanilaservak.aternos.me'; // IP сервера
 const SERVER_PORT = 40987;                     // динамічний порт Aternos
-const BOT_NAME = 'lohopedra';                  // Нікнейм бота
+const BOT_NAME = 'lohopedra2';                  // Нікнейм бота
 
 function createBot() {
   const bot = mineflayer.createBot({
