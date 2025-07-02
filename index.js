@@ -1,11 +1,13 @@
 const mineflayer = require('mineflayer');
 const express = require('express');
 
-const SERVER_HOST = 'vanilaservak.aternos.me'; // IP сервера
-const SERVER_PORT = 40987;                     // динамічний порт Aternos
-const BOT_NAME = 'lohopedra';                  // Нік бота
+const SERVER_HOST = 'vanilaservak.aternos.me'; // IP
+const SERVER_PORT = 40987; // Заміни на актуальний порт Aternos
+const BOT_NAME = 'lohopedra';
 
 function createBot() {
+  console.log('⏳ Підключення бота...');
+
   const bot = mineflayer.createBot({
     host: SERVER_HOST,
     port: SERVER_PORT,
@@ -17,8 +19,8 @@ function createBot() {
     console.log(`✅ Бот ${BOT_NAME} увійшов на сервер`);
   });
 
-  // Anti-AFK — стрибає кожні 6 секунд
   bot.on('spawn', () => {
+    console.log('🟢 Бот заспавнився. Стрибає кожні 6 сек.');
     setInterval(() => {
       if (bot.entity?.onGround) {
         bot.setControlState('jump', true);
@@ -27,41 +29,41 @@ function createBot() {
     }, 6000);
   });
 
-  // Коли бот кікнутий — вивести причину
   bot.on('kicked', (reason) => {
     console.log('❌ Бота кікнули:', reason);
+    restartWithDelay();
   });
 
-  // Якщо бот просто вийшов — перезапуск
   bot.on('end', () => {
-    console.log('⚠️ Бот вийшов. Перезапуск через 10 сек...');
-    setTimeout(createBot, 10000);
+    console.log('⚠️ З’єднання закрито. Перезапуск...');
+    restartWithDelay();
   });
 
-  // Якщо бот вилетів з помилкою — перезапуск
   bot.on('error', (err) => {
-    console.log('❌ Помилка бота:', err);
-    console.log('🔁 Перезапуск через 10 сек...');
-    setTimeout(createBot, 10000);
+    console.log('❌ Помилка бота:', err.message || err);
+    if (err.code === 'ECONNRESET') {
+      console.log('🔁 Сервер скинув з’єднання. Чекаємо 60 сек...');
+    }
+    restartWithDelay();
   });
 }
 
-createBot(); // Старт бота
+function restartWithDelay() {
+  setTimeout(() => {
+    createBot();
+  }, 60000); // 60 секунд паузи перед новим з’єднанням
+}
 
-// 🌐 HTTP-сервер для Render
+createBot();
+
+// Необов'язковий Express-сервер для Render
 const app = express();
 const PORT = process.env.PORT || 3000;
+app.get('/', (req, res) => res.send('✅ Бот активний'));
+app.listen(PORT, () => console.log(`🌐 HTTP сервер на порту ${PORT}`));
 
-app.get('/', (req, res) => {
-  res.send('✅ Бот активний!');
-});
-
-app.listen(PORT, () => {
-  console.log(`🌐 HTTP-сервер слухає на порту ${PORT}`);
-});
-
-// 🔁 Самопінг кожні 5 хвилин (щоб Render не вимикав)
+// Пінгати себе кожні 5 хвилин (тільки якщо Render Web Service)
 setInterval(() => {
   require('https').get('https://aternos-keepalive.onrender.com');
-  console.log('🔁 Пінг до Render (keep-alive)');
+  console.log('🔁 Пінг Render (keep-alive)');
 }, 5 * 60 * 1000);
