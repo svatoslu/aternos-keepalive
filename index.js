@@ -3,7 +3,7 @@ const mineflayer = require('mineflayer');
 function createBot() {
   const bot = mineflayer.createBot({
     host: 'vanilaservak.aternos.me',
-    port: 45565,
+    port: 40987,
     username: 'lohopedra',
     version: false,
   });
