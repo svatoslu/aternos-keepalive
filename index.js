@@ -3,21 +3,21 @@ const express = require('express');
 
 const SERVER_HOST = 'vanilaservak.aternos.me'; // IP сервера
 const SERVER_PORT = 40987;                     // динамічний порт Aternos
-const BOT_NAME = 'lohopedra2';                  // Нікнейм бота
+const BOT_NAME = 'lohopedra2';                  // Нік бота
 
 function createBot() {
   const bot = mineflayer.createBot({
     host: SERVER_HOST,
     port: SERVER_PORT,
     username: BOT_NAME,
-    version: false, // авто-версія клієнта
+    version: false,
   });
 
   bot.on('login', () => {
-    console.log(`✅ Бот ${BOT_NAME} підключився до сервера!`);
+    console.log(`✅ Бот ${BOT_NAME} увійшов на сервер`);
   });
 
-  // Anti-AFK: бот стрибає кожні 6 секунд
+  // Anti-AFK — стрибає кожні 6 секунд
   bot.on('spawn', () => {
     setInterval(() => {
       if (bot.entity?.onGround) {
@@ -27,35 +27,41 @@ function createBot() {
     }, 6000);
   });
 
-  // Автоматичний перезапуск, якщо бот відключається
+  // Коли бот кікнутий — вивести причину
+  bot.on('kicked', (reason) => {
+    console.log('❌ Бота кікнули:', reason);
+  });
+
+  // Якщо бот просто вийшов — перезапуск
   bot.on('end', () => {
-    console.log('🔁 Бот відключений. Перезапуск через 10 сек...');
+    console.log('⚠️ Бот вийшов. Перезапуск через 10 сек...');
     setTimeout(createBot, 10000);
   });
 
-  bot.on('error', err => {
-    console.log('❌ Помилка:', err);
+  // Якщо бот вилетів з помилкою — перезапуск
+  bot.on('error', (err) => {
+    console.log('❌ Помилка бота:', err);
+    console.log('🔁 Перезапуск через 10 сек...');
+    setTimeout(createBot, 10000);
   });
 }
 
 createBot(); // Старт бота
 
-// ===============================
 // 🌐 HTTP-сервер для Render
-// ===============================
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.get('/', (req, res) => {
-  res.send('✅ Бот активний');
+  res.send('✅ Бот активний!');
 });
 
 app.listen(PORT, () => {
-  console.log(`🌐 HTTP-сервер запущено на порту ${PORT}`);
+  console.log(`🌐 HTTP-сервер слухає на порту ${PORT}`);
 });
 
-// 🔁 Самопінг, щоб Render не засинав
+// 🔁 Самопінг кожні 5 хвилин (щоб Render не вимикав)
 setInterval(() => {
   require('https').get('https://aternos-keepalive.onrender.com');
-  console.log('🔁 Ping sent to keep Render awake');
+  console.log('🔁 Пінг до Render (keep-alive)');
 }, 5 * 60 * 1000);
