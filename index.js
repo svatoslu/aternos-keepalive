@@ -10,6 +10,16 @@ function createBot() {
 
   bot.on('login', () => {
     console.log('✅ Бот увійшов на сервер!');
+
+    // Почати стрибати кожні 3 секунди
+    setInterval(() => {
+      if (bot.entity && bot.entity.onGround) {
+        bot.setControlState('jump', true);
+        setTimeout(() => {
+          bot.setControlState('jump', false);
+        }, 500); // тримає кнопку jump натиснутою 0.5 сек
+      }
+    }, 3000);
   });
 
   bot.on('end', () => {
