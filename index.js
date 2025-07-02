@@ -3,9 +3,9 @@ const mineflayer = require('mineflayer');
 function createBot() {
   const bot = mineflayer.createBot({
     host: 'vanilaservak.aternos.me',
-    port: 40987,
+    port: 25565,
     username: 'lohopedra',
-    version: ,
+    version: false,
   });
 
   bot.on('login', () => {
@@ -24,7 +24,7 @@ function createBot() {
 
   bot.on('end', () => {
     console.log('🔁 Бот вийшов. Перезапуск через 10 сек...');
-    setTimeout(createBot, 1000);
+    setTimeout(createBot, 10000);
   });
 
   bot.on('error', (err) => {
