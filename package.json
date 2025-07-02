@@ -1,0 +1,11 @@
+{
+  "name": "aternos-keepalive",
+  "version": "1.0.0",
+  "main": "index.js",
+  "dependencies": {
+    "mineflayer": "^4.5.0"
+  },
+  "scripts": {
+    "start": "node index.js"
+  }
+}
