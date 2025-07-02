@@ -5,7 +5,7 @@ function createBot() {
     host: 'vanilaservak.aternos.me',
     port: 40987,
     username: 'lohopedra',
-    version: 1.16.5,
+    version: ,
   });
 
   bot.on('login', () => {
